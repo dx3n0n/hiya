@@ -21,12 +21,21 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    url = request.form['url']
+    # Get JSON data from the request
+    data = request.get_json()
+    
+    # Check if 'url' exists in the JSON data
+    if not data or 'url' not in data:
+        return jsonify({'error': 'No URL provided'}), 400  # Error handling
+
+    # Extract URL and make prediction
+    url = data['url']
     features = extract_features(url)
     prediction = model.predict([features])[0]
     result = 'Phishing' if prediction == 1 else 'Benign'
+    
+    # Return the result as JSON
     return jsonify({'url': url, 'result': result})
 
 if __name__ == "__main__":
     app.run(debug=True)
-
